@@ -1,0 +1,63 @@
+{
+    "rrb": {
+        "options": {
+            "redis": {
+                "port": 6379,
+                "host": "localhost",
+                "family": 4,
+                "password": null,
+                "db": 0,
+                "prefix": "mh:"
+            }
+        },
+        "channels": {
+            "logging": "logging:log",
+            "meme": {
+                "edited": "events:edit"
+            },
+            "categories": {
+                "created": "events:category-created",
+                "deleted": "events:category-deleted",
+                "mappingCreated": "events:category-mapping-created",
+                "mappingDeleted": "events:category-mapping-deleted",
+                "maximumChanged": "events:category-maximum-changed",
+                "columnsChanged": "events:category-columns-changed"
+            }
+        },
+        "queues": {
+            "config": {
+                "set": "config:set"
+            },
+            "categories": {
+                "create": "categories:create",
+                "delete": "categories:delete",
+                "list": "categories:list",
+                "createMapping": "categories:create-mapping",
+                "deleteMapping": "categories:delete-mapping",
+                "mappings": "categories:mappings",
+                "get": "categories:get",
+                "set": "categories:set",
+                "add": "categories:add",
+                "remove": "categories:remove",
+                "validate": "categories:validate",
+                "getOrSetMaximum": "categories:maximum",
+                "getOrSetColumns": "categories:columns"
+            }
+        }
+    },
+    "mongodb": {
+        "connection": "localhost",
+        "database": "development",
+        "collections": {
+            "memes": "memes"
+        }
+    },
+    "state": {
+        "categories": {
+            "active": [],
+            "mappings": {},
+            "maximum": 5,
+            "columns": 5
+        }
+    }
+}
