@@ -17,12 +17,12 @@ module.exports = class Lock {
      * @param {Promise<any>} executor The async function to run with the lock
      */
     async run(executor) {
-        while (lock)
-            await lock;
+        while (this.lock)
+            await this.lock;
 
         let error = undefined;
         let result = undefined;
-        lock = new Promise(async (resolve, reject) => {
+        this.lock = new Promise(async (resolve, reject) => {
             try {
                 result = await executor();
             }
@@ -31,12 +31,12 @@ module.exports = class Lock {
             }
             finally {
                 // release the lock
-                lock = undefined;
+                this.lock = undefined;
                 resolve();
             }
         });
 
-        await lock;
+        await this.lock;
 
         if (error)
             throw error;

@@ -22,7 +22,7 @@ async function start() {
 
     // Start the service
     try {
-        config = await _config.build(base_config);
+        await _config.start(base_config);
         await log.log('notice', 'Startup complete');
     }
     catch (error) {

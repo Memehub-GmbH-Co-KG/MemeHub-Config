@@ -5,12 +5,15 @@
                 "port": 6379,
                 "host": "localhost",
                 "family": 4,
-                "password": null,
+                "password": "",
                 "db": 0,
                 "prefix": "mh:"
             }
         },
         "channels": {
+            "config": {
+                "changed": "events:config-changed"
+            },
             "logging": "logging:log",
             "meme": {
                 "edited": "events:edit"
