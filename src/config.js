@@ -71,8 +71,10 @@ module.exports.build = async base_config => {
     Defaults.setDefaults(config.rrb.options);
     const workerSet = new Worker(config.rrb.queues.config.set, set);
     const publisherChanged = new Publisher(config.rrb.channels.config.changed);
-    await publisherChanged.connect();
+    const subscriberChanged = new Subscriber(config.rrb.channels.config.changed, onChanged);
     await workerSet.listen();
+    await publisherChanged.connect();
+    await subscriberChanged.listen();
 
     // After init, connect to logger
     await log.start(config);
@@ -126,7 +128,21 @@ module.exports.build = async base_config => {
             await save_config_no_lock(config);
         });
 
-        // Trigger restart to re-read config
+        // publish changed
+        await publisherChanged.publish(Object.keys(keys));
+    }
+
+    /**
+     * Restart when the rrb config is changed.
+     * @param {*} keys 
+     */
+    async function onChanged(keys) {
+        if (!Array.isArray(keys))
+            return;
+
+        if (!keys.some(k.startsWith('rrb')))
+            return;
+
         restart(base_config);
     }
 
@@ -181,6 +197,7 @@ module.exports.build = async base_config => {
             await log.log('notice', 'Shutting down...');
             await workerSet.stop();
             await publisherChanged.disconnect();
+            await subscriberChanged.stop();
             await log.stop();
         }
     };
