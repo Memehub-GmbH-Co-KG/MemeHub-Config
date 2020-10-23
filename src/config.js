@@ -142,7 +142,7 @@ module.exports.build = async base_config => {
         if (!key)
             return config;
 
-        key.split('.').reduce((c, k) => c[k], config)
+        return key.split('.').reduce((c, k) => c[k], config);
     }
 
     /**
