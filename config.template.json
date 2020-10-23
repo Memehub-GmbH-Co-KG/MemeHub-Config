@@ -9,9 +9,14 @@
         },
         "channels": {
             "config": {
-                "changed": "events:config-changed"
+                "changed": "events:config-changed",
+                "set": "config:set",
+                "get": "config:get"
             },
-            "logging": "logging:log",
+            "logging": {
+                "log": "logging:log",
+                "get": "logging:get"
+            },
             "meme": {
                 "edited": "events:edit"
             },
@@ -21,15 +26,7 @@
                 "mappingCreated": "events:category-mapping-created",
                 "mappingDeleted": "events:category-mapping-deleted",
                 "maximumChanged": "events:category-maximum-changed",
-                "columnsChanged": "events:category-columns-changed"
-            }
-        },
-        "queues": {
-            "config": {
-                "set": "config:set",
-                "get": "config:get"
-            },
-            "categories": {
+                "columnsChanged": "events:category-columns-changed",
                 "create": "categories:create",
                 "delete": "categories:delete",
                 "list": "categories:list",
