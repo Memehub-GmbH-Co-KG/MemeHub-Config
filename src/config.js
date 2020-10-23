@@ -69,8 +69,8 @@ module.exports.build = async base_config => {
 
     // Set up rrb
     Defaults.setDefaults(config.rrb.options);
-    const workerSet = new Worker(config.rrb.queues.config.set, set);
-    const workerGet = new Worker(config.rrb.queues.config.get, get);
+    const workerSet = new Worker(config.rrb.channels.config.set, set);
+    const workerGet = new Worker(config.rrb.channels.config.get, get);
     const publisherChanged = new Publisher(config.rrb.channels.config.changed);
     const subscriberChanged = new Subscriber(config.rrb.channels.config.changed, onChanged);
 
