@@ -133,6 +133,16 @@ module.exports.build = async base_config => {
     }
 
     /**
+     * Returns the current config
+     */
+    async function get(key) {
+        if (!key)
+            return config;
+
+        key.split('.').reduce((c, k) => c[k], config)
+    }
+
+    /**
      * Restart when the rrb config is changed.
      * @param {*} keys 
      */

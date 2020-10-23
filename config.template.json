@@ -4,8 +4,6 @@
             "redis": {
                 "port": 6379,
                 "host": "mhredis",
-                "family": 4,
-                "db": 0,
                 "prefix": "mh:"
             }
         },
@@ -28,7 +26,8 @@
         },
         "queues": {
             "config": {
-                "set": "config:set"
+                "set": "config:set",
+                "get": "config:get"
             },
             "categories": {
                 "create": "categories:create",
