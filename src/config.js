@@ -138,11 +138,14 @@ module.exports.build = async base_config => {
     /**
      * Returns the current config
      */
-    async function get(key) {
+    async function get(keys) {
         if (!key)
             return config;
 
-        return key.split('.').reduce((c, k) => c[k], config);
+        if (!Array.isArray(keys))
+            throw 'Invalid Parameter keys: Has to be an array';
+
+        return keys.map(key => key.split('.').reduce((c, k) => c[k], config));
     }
 
     /**
