@@ -70,16 +70,19 @@ module.exports.build = async base_config => {
     // Set up rrb
     Defaults.setDefaults(config.rrb.options);
     const workerSet = new Worker(config.rrb.queues.config.set, set);
+    const workerGet = new Worker(config.rrb.queues.config.get, get);
     const publisherChanged = new Publisher(config.rrb.channels.config.changed);
     const subscriberChanged = new Subscriber(config.rrb.channels.config.changed, onChanged);
-    await workerSet.listen();
-    await publisherChanged.connect();
-    await subscriberChanged.listen();
+
+    await Promise.all(
+        workerSet.listen(),
+        workerGet.listen(),
+        publisherChanged.connect(),
+        subscriberChanged.listen()
+    );
 
     // After init, connect to logger
     await log.start(config);
-
-    await publisherChanged.publish({});
 
     /**
      * Set multiple config keys to new values.
@@ -205,9 +208,12 @@ module.exports.build = async base_config => {
     return {
         stop: async function () {
             await log.log('notice', 'Shutting down...');
-            await workerSet.stop();
-            await publisherChanged.disconnect();
-            await subscriberChanged.stop();
+            await Promise.all(
+                workerSet.stop(),
+                workerGet.stop(),
+                publisherChanged.disconnect(),
+                subscriberChanged.stop()
+            );
             await log.stop();
         }
     };
