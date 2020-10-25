@@ -3,6 +3,7 @@ const fs = require('fs');
 const Lock = require('./lock');
 const startLock = new Lock();
 const log = require('./log');
+const _commands = require('./commands');
 let current = undefined;
 
 module.exports.start = async base_config => {
@@ -37,6 +38,7 @@ module.exports.stop = async () => {
 }
 
 const restart = module.exports.restart = async base_config => {
+    await log.log('notice', 'Restarting...');
     startLock.run(async () => {
         if (current) {
             try {
@@ -69,20 +71,27 @@ module.exports.build = async base_config => {
 
     // Set up rrb
     Defaults.setDefaults(config.rrb.options);
+
+    // After init, connect to logger
+    await log.start(config);
+
+    // Connect to RRB
     const workerSet = new Worker(config.rrb.channels.config.set, set);
     const workerGet = new Worker(config.rrb.channels.config.get, get);
     const publisherChanged = new Publisher(config.rrb.channels.config.changed);
     const subscriberChanged = new Subscriber(config.rrb.channels.config.changed, onChanged);
 
-    await Promise.all(
+    await Promise.all([
         workerSet.listen(),
         workerGet.listen(),
         publisherChanged.connect(),
         subscriberChanged.listen()
-    );
+    ]);
 
-    // After init, connect to logger
-    await log.start(config);
+    // Register telegram commands
+    const commands = await _commands.build(base_config.token, get, set);
+
+    await log.log('notice', 'Startup complete');
 
     /**
      * Set multiple config keys to new values.
@@ -112,7 +121,7 @@ module.exports.build = async base_config => {
             const new_config = await read_config_no_lock();
 
             // Apply changes
-            for (const key in Object.keys(keys)) {
+            for (const [key, value] of Object.entries(keys)) {
                 const subkeys = key.split('.');
                 let current_conf_part = new_config;
                 for (const subkey of subkeys.slice(0, -1)) {
@@ -122,7 +131,7 @@ module.exports.build = async base_config => {
                     current_conf_part = current_conf_part[subkey];
                 }
 
-                const final_subkey = subkeys[subkeys.length];
+                const final_subkey = subkeys[subkeys.length - 1];
                 current_conf_part[final_subkey] = value;
             }
 
@@ -132,6 +141,7 @@ module.exports.build = async base_config => {
         });
 
         // publish changed
+        await log.log('info', 'Config updated', keys);
         await publisherChanged.publish(Object.keys(keys));
     }
 
@@ -139,13 +149,19 @@ module.exports.build = async base_config => {
      * Returns the current config
      */
     async function get(keys) {
-        if (!key)
+        if (!keys)
             return config;
 
         if (!Array.isArray(keys))
             throw 'Invalid Parameter keys: Has to be an array';
 
-        return keys.map(key => key.split('.').reduce((c, k) => c[k], config));
+        try {
+            return keys.map(key => key.split('.').reduce((c, k) => c[k], config));
+        }
+        catch (e) {
+            log.log('warning', 'Invalid / Unknown config key requested', { keys });
+            throw 'One or more requested config keys do not exist';
+        }
     }
 
     /**
@@ -156,7 +172,7 @@ module.exports.build = async base_config => {
         if (!Array.isArray(keys))
             return;
 
-        if (!keys.some(k.startsWith('rrb')))
+        if (!keys.some(k => k.startsWith('rrb')))
             return;
 
         restart(base_config);
@@ -178,7 +194,7 @@ module.exports.build = async base_config => {
      */
     async function read_config_no_lock() {
         try {
-            const file = await fs.promises.readFile(`./${base_config.file}`);
+            const file = await fs.promises.readFile(`${base_config.file}`);
             return JSON.parse(file);
         }
         catch (error) {
@@ -205,18 +221,19 @@ module.exports.build = async base_config => {
      * @throws If the file cannot be written.
      */
     async function save_config_no_lock(config) {
-        await fs.promises.writeFile(`../${base_config.file}`, JSON.stringify(config))
+        await fs.promises.writeFile(`${base_config.file}`, JSON.stringify(config))
     }
 
     return {
         stop: async function () {
             await log.log('notice', 'Shutting down...');
-            await Promise.all(
+            await Promise.all([
                 workerSet.stop(),
                 workerGet.stop(),
                 publisherChanged.disconnect(),
-                subscriberChanged.stop()
-            );
+                subscriberChanged.stop(),
+                commands.stop
+            ]);
             await log.stop();
         }
     };

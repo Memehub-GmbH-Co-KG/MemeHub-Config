@@ -44,10 +44,12 @@
         }
     },
     "mongodb": {
-        "connection": "localhost",
+        "connection": "mhmongo",
         "database": "development",
         "collections": {
-            "memes": "memes"
+            "memes": "memes",
+            "users": "users",
+            "logs": "logs"
         }
     },
     "state": {
@@ -56,6 +58,79 @@
             "mappings": {},
             "maximum": 5,
             "columns": 5
+        }
+    },
+    "logging": {
+        "targets": [
+            {
+                "type": "console",
+                "enabled": true,
+                "level": "debug",
+                "timestamp": "HH:mm:ss.SSS",
+                "indentation": "   ] "
+            },
+            {
+                "type": "cache",
+                "enabled": false,
+                "level": "debug",
+                "size": 1000,
+                "name": "default"
+            },
+            {
+                "type": "mongodb",
+                "enabled": false,
+                "level": "info",
+                "collection": "log"
+            },
+            {
+                "type": "telegram",
+                "enabled": false,
+                "level": "warning",
+                "chats": [
+                    123
+                ],
+                "timestamp": "HH:mm:ss.SSS"
+            }
+        ],
+        "levels": {
+            "hierarchy": {
+                "error": 0,
+                "warning": 1,
+                "notice": 2,
+                "info": 3,
+                "debug": 4
+            },
+            "mapping": {
+                "error": "error",
+                "err": "error",
+                "warning": "warning",
+                "wrn": "warning",
+                "notice": "notice",
+                "ntc": "notice",
+                "info": "info",
+                "inf": "info",
+                "debug": "debug",
+                "dbg": "debug"
+            },
+            "internal": {
+                "onInvalidLog": "warning",
+                "onTargetFailedToHandle": "warning"
+            }
+        },
+        "targetErrorTimeout": 300000,
+        "events": {
+            "logEvents": false,
+            "level": "info",
+            "prefix": "events",
+            "channels": [
+                "contest-created",
+                "contest-deleted",
+                "contest-started",
+                "contest-stopped",
+                "post",
+                "vote",
+                "retract-vote"
+            ]
         }
     }
 }
