@@ -195,7 +195,7 @@ module.exports.build = async base_config => {
     async function read_config_no_lock() {
         try {
             const file = await fs.promises.readFile(`${base_config.file}`);
-            return JSON.parse(file);
+            return Object.assign(JSON.parse(file), { bot_token: base_config.token });
         }
         catch (error) {
             // This likely means that the config file does not exist.
@@ -203,7 +203,7 @@ module.exports.build = async base_config => {
         }
 
         const file = await fs.promises.readFile('./config.template.json');
-        return JSON.parse(file);
+        return Object.assign(JSON.parse(file), { bot_token: base_config.token });
     }
 
     /**
