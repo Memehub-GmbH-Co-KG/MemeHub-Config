@@ -1,4 +1,8 @@
 {
+    "telegram": {
+        "bot_token": null,
+        "group_id": null
+    },
     "rrb": {
         "options": {
             "redis": {
@@ -86,9 +90,7 @@
                 "type": "telegram",
                 "enabled": false,
                 "level": "warning",
-                "chats": [
-                    123
-                ],
+                "chats": [],
                 "timestamp": "HH:mm:ss.SSS"
             }
         ],

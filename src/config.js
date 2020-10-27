@@ -89,7 +89,7 @@ module.exports.build = async base_config => {
     ]);
 
     // Register telegram commands
-    const commands = await _commands.build(base_config.token, get, set);
+    const commands = await _commands.build(config.telegram.bot_token, get, set);
 
     await log.log('notice', 'Startup complete');
 
@@ -193,17 +193,40 @@ module.exports.build = async base_config => {
      * Do only call while having the config file lock!
      */
     async function read_config_no_lock() {
+        let config;
+        let is_from_template = false;
         try {
-            const file = await fs.promises.readFile(`${base_config.file}`);
-            return Object.assign(JSON.parse(file), { bot_token: base_config.token });
+            const file = await fs.promises.readFile(base_config);
+            config = JSON.parse(file);
         }
         catch (error) {
             // This likely means that the config file does not exist.
             await log.log('notice', 'Cannot read config file. Using template.');
+            const file = await fs.promises.readFile('./config.template.json');
+            config = JSON.parse(file);
+            is_from_template = true;
         }
 
-        const file = await fs.promises.readFile('./config.template.json');
-        return Object.assign(JSON.parse(file), { bot_token: base_config.token });
+        // Override bot_token if provided
+        if (base_config.token) {
+            console.warn('Overwriting telegram bot token with env variable.');
+            config.telegram.bot_token = base_config.token;
+        }
+
+        // Write config, if template has been used
+        if (is_from_template)
+            await save_config_no_lock(config);
+
+        // Queue restart if no bot_token is provided
+        if (!config.telegram.bot_token) {
+            console.warn('Config does not include a bot token! Please edit the config file to include the token at "telegram.bot_token" or set the \
+                environment variable "BOT_TOKEN". Restarting in 30 seconds.');
+            setTimeout(() => {
+                restart(base_config);
+            }, 30_000);
+        }
+
+        return config;
     }
 
     /**

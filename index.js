@@ -10,15 +10,9 @@ async function start() {
     // Get config from default / env
     const base_config = {
         env: process.env.NODE_ENV,
-        token: process.env.BOT_TOKEN,
+        token: process.env.BOT_TOKEN || undefined,
         file: process.env.FILE || 'config.json'
     };
-
-    // Check for token
-    if (!base_config.token) {
-        console.error("Cannot start without a bot token. Set BOT_TOKEN when starting.");
-        process.exit(1);
-    }
 
     // Start the service
     try {
