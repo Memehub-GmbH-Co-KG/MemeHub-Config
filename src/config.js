@@ -1,5 +1,6 @@
 const { Defaults, Publisher, Subscriber, Worker } = require('redis-request-broker');
 const fs = require('fs');
+const path = require('path');
 const Lock = require('./lock');
 const startLock = new Lock();
 const log = require('./log');
@@ -196,19 +197,19 @@ module.exports.build = async base_config => {
         let config;
         let is_from_template = false;
         try {
-            const file = await fs.promises.readFile(base_config);
+            const file = await fs.promises.readFile(base_config.file);
             config = JSON.parse(file);
         }
         catch (error) {
             // This likely means that the config file does not exist.
-            await log.log('notice', 'Cannot read config file. Using template.');
+            await log.log('notice', 'Cannot read config file. Using template.', error);
             const file = await fs.promises.readFile('./config.template.json');
             config = JSON.parse(file);
             is_from_template = true;
         }
 
         // Override bot_token if provided
-        if (base_config.token) {
+        if (base_config.token && config.telegram.bot_token !== base_config.token) {
             console.warn('Overwriting telegram bot token with env variable.');
             config.telegram.bot_token = base_config.token;
         }
@@ -244,7 +245,8 @@ module.exports.build = async base_config => {
      * @throws If the file cannot be written.
      */
     async function save_config_no_lock(config) {
-        await fs.promises.writeFile(`${base_config.file}`, JSON.stringify(config))
+        await fs.promises.mkdir(path.dirname(base_config.file), { recursive: true });
+        await fs.promises.writeFile(base_config.file, JSON.stringify(config))
     }
 
     return {

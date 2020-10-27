@@ -11,7 +11,7 @@ async function start() {
     const base_config = {
         env: process.env.NODE_ENV,
         token: process.env.BOT_TOKEN || undefined,
-        file: process.env.FILE || '/etc/mh-config.json'
+        file: process.env.FILE || '/etc/memehub/config.json'
     };
 
     // Start the service
