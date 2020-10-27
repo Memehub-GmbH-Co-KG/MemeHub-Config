@@ -11,13 +11,12 @@ async function start() {
     const base_config = {
         env: process.env.NODE_ENV,
         token: process.env.BOT_TOKEN || undefined,
-        file: process.env.FILE || 'config.json'
+        file: process.env.FILE || '/etc/mh-config.json'
     };
 
     // Start the service
     try {
         await _config.start(base_config);
-        await log.log('notice', 'Startup complete');
     }
     catch (error) {
         log.log('error', 'Error during startup', error);

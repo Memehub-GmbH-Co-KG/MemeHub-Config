@@ -89,7 +89,7 @@ module.exports.build = async base_config => {
     ]);
 
     // Register telegram commands
-    const commands = await _commands.build(config.telegram.bot_token, get, set);
+    const commands = await _commands.build(config, get, set);
 
     await log.log('notice', 'Startup complete');
 
