@@ -15,7 +15,6 @@ module.exports.build = async (config, get, set) => {
 
     async function config_get(ctx) {
         try {
-            console.log('GET CONFIG CTX', ctx.update.message);
             if (!await hasPermissions(ctx.update.message.from))
                 throw 'You are not allowed to see the config.';
 

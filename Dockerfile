@@ -1,5 +1,6 @@
-FROM node:14-alpine
+FROM node:15-alpine
 WORKDIR /usr/src/memehub-config
-COPY . .
+COPY package*.json ./
 RUN npm install
-CMD [ "npm", "run", "start" ]
+COPY . .
+CMD [ "node", "index.js" ]
