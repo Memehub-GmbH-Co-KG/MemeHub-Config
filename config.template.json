@@ -53,7 +53,7 @@
         }
     },
     "mongodb": {
-        "connection": "mhmongo",
+        "connection": "mongodb://root:root@mhmongo",
         "database": "development",
         "collections": {
             "memes": "memes",
@@ -88,8 +88,7 @@
             {
                 "type": "mongodb",
                 "enabled": false,
-                "level": "info",
-                "collection": "log"
+                "level": "info"
             },
             {
                 "type": "telegram",
