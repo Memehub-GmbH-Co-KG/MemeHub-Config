@@ -44,6 +44,11 @@
                 "validate": "categories:validate",
                 "getOrSetMaximum": "categories:maximum",
                 "getOrSetColumns": "categories:columns"
+            },
+            "permissions": {
+                "isAdmin": "permissions:is-admin",
+                "canChangeInfo": "permissions:can-change-info",
+                "canDeleteMessages": "permissions:can-delete-messages"
             }
         }
     },
@@ -134,5 +139,8 @@
                 "retract-vote"
             ]
         }
+    },
+    "permissions": {
+        "ttl": 3600000
     }
 }
