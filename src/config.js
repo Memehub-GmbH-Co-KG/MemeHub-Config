@@ -186,43 +186,40 @@ module.exports.build = async base_config => {
     }
 
     /**
-     * Reads ands returns the current config file. If it does not exist,
-     * the template file is read instead. 
-     * @retuns The current config of the config file, parsed as json.
-     * @throws If the template file cannot be read.
+     * Calls read_config_no_lock while having the file lock.
      */
     async function read_config() {
         return await lock.run(read_config_no_lock);
     }
 
     /**
-     * The actual implementaion of read_config, but without using a lock.
-     * Do only call while having the config file lock!
+     * Reads ands returns the current config file. 
+     * 
+     * Uses keys from the template, if they do not exist in the actual config.
+     * If there is no config file, a copy of the template will be written.
+     * 
+     * @retuns The current config of the config file, parsed as json.
+     * @throws If the template file cannot be read.
      */
     async function read_config_no_lock() {
-        let config;
-        let is_from_template = false;
+
+        // Read tempalte file
+        const template = await fs.promises.readFile('./config.template.json');
+        const config = JSON.parse(template);
+
+        // Override bot_token 
+        config.telegram.bot_token = base_config.token;
+
+        // Read actual config
         try {
             const file = await fs.promises.readFile(base_config.file);
-            config = JSON.parse(file);
+            Object.assign(config, JSON.parse(file));
         }
         catch (error) {
             // This likely means that the config file does not exist.
-            await log.log('notice', 'Cannot read config file. Using template.', error);
-            const file = await fs.promises.readFile('./config.template.json');
-            config = JSON.parse(file);
-            is_from_template = true;
-        }
-
-        // Override bot_token if provided
-        if (base_config.token && config.telegram.bot_token !== base_config.token) {
-            console.warn('Overwriting telegram bot token with env variable.');
-            config.telegram.bot_token = base_config.token;
-        }
-
-        // Write config, if template has been used
-        if (is_from_template)
+            await log.log('notice', 'Cannot read config file. Writing template.', error);
             await save_config_no_lock(config);
+        }
 
         // Queue restart if no bot_token is provided
         if (!config.telegram.bot_token) {
