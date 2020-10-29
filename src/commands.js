@@ -37,7 +37,7 @@ module.exports.build = async (config, get, set) => {
 
     async function config_set(ctx) {
         try {
-            if (!await hasPermissions(ctx.message.from.user))
+            if (!await hasPermissions(ctx.update.message.from))
                 throw 'You are not allowed to change the config.';
 
             const key = ctx.state.command.splitArgs[0];

@@ -71,7 +71,13 @@ module.exports.build = async base_config => {
     let config = await read_config();
 
     // Set up rrb
-    Defaults.setDefaults(config.rrb.options);
+    Defaults.setDefaults({
+        redis: {
+            prefix: "mh:",
+            host: "mhredis",
+            port: 6379
+        }
+    });
 
     // After init, connect to logger
     await log.start(config);

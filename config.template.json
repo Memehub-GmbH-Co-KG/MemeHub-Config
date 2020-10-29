@@ -3,14 +3,20 @@
         "bot_token": null,
         "group_id": null
     },
-    "rrb": {
-        "options": {
-            "redis": {
-                "port": 6379,
-                "host": "mhredis",
-                "prefix": "mh:"
-            }
+    "redis": {
+        "connection": {
+            "port": 6379,
+            "host": "mhredis",
+            "prefix": "mh:"
         },
+        "keys": {
+            "categories": "state:categories",
+            "mappings": "state:categories:mappings",
+            "maximum": "state:categories:maximum",
+            "columns": "state:categories:columns"
+        }
+    },
+    "rrb": {
         "channels": {
             "config": {
                 "changed": "events:config-changed",
