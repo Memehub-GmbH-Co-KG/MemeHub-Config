@@ -71,6 +71,18 @@
                 "isAdmin": "permissions:is-admin",
                 "canChangeInfo": "permissions:can-change-info",
                 "canDeleteMessages": "permissions:can-delete-messages"
+            },
+            "contests": {
+                "started": "events:contest-started",
+                "stopped": "events:contest-started",
+                "created": "events:contest-created",
+                "deleted": "events:contest-deleted",
+                "create": "contests:create",
+                "start": "contests:start",
+                "stop": "contests:stop",
+                "delete": "contests:delete",
+                "list": "contests:list",
+                "top": "contests:top"
             }
         }
     },
@@ -80,7 +92,8 @@
         "collections": {
             "memes": "memes",
             "users": "users",
-            "logs": "logs"
+            "logs": "logs",
+            "contests": "contests"
         }
     },
     "state": {
