@@ -219,7 +219,11 @@ module.exports.build = async base_config => {
         // Read actual config
         try {
             const file = await fs.promises.readFile(base_config.file);
-            Object.assign(config, JSON.parse(file));
+            console.log('config before merge');
+            console.log(config);
+            mergeDeep(config, JSON.parse(file));
+            console.log('config after merge');
+            console.log(config);
         }
         catch (error) {
             // This likely means that the config file does not exist.
@@ -258,6 +262,8 @@ module.exports.build = async base_config => {
         await fs.promises.writeFile(base_config.file, JSON.stringify(config))
     }
 
+
+
     return {
         stop: async function () {
             await log.log('notice', 'Shutting down...');
@@ -273,3 +279,35 @@ module.exports.build = async base_config => {
     };
 }
 
+
+/**
+ * Simple object check.
+ * @param item
+ * @returns {boolean}
+ */
+function isObject(item) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
+/**
+ * Deep merge two objects.
+ * @param target
+ * @param ...sources
+ */
+function mergeDeep(target, ...sources) {
+    if (!sources.length) return target;
+    const source = sources.shift();
+
+    if (isObject(target) && isObject(source)) {
+        for (const key in source) {
+            if (isObject(source[key])) {
+                if (!target[key]) Object.assign(target, { [key]: {} });
+                mergeDeep(target[key], source[key]);
+            } else {
+                Object.assign(target, { [key]: source[key] });
+            }
+        }
+    }
+
+    return mergeDeep(target, ...sources);
+}
