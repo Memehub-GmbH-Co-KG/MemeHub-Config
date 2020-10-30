@@ -7,6 +7,8 @@ const log = require('./log');
 const _commands = require('./commands');
 let current = undefined;
 
+const KEY_SEP = ':';
+
 module.exports.start = async base_config => {
     startLock.run(async () => {
         if (current)
@@ -129,7 +131,7 @@ module.exports.build = async base_config => {
 
             // Apply changes
             for (const [key, value] of Object.entries(keys)) {
-                const subkeys = key.split('.');
+                const subkeys = key.split(KEY_SEP);
                 let current_conf_part = new_config;
                 for (const subkey of subkeys.slice(0, -1)) {
                     if (!(subkey in current_conf_part))
@@ -163,7 +165,7 @@ module.exports.build = async base_config => {
             throw 'Invalid Parameter keys: Has to be an array';
 
         try {
-            return keys.map(key => key.split('.').reduce((c, k) => c[k], config));
+            return keys.map(key => key.split(KEY_SEP).reduce((c, k) => c[k], config));
         }
         catch (e) {
             log.log('warning', 'Invalid / Unknown config key requested', { keys });
