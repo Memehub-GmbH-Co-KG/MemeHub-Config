@@ -1,6 +1,7 @@
 const { Client } = require('redis-request-broker');
 const { Telegraf } = require('telegraf');
 const commandParts = require('telegraf-command-parts');
+const timers = require('timers/promises');
 const log = require('./log');
 
 module.exports.build = async (config, get, set) => {
@@ -21,14 +22,14 @@ module.exports.build = async (config, get, set) => {
             const args = ctx.state.command.args.split(' ').filter(x => x !== '');
             const withArgs = args.length > 0;
             const response = await get(withArgs ? args : false);
-            const message = withArgs
-                ? args
-                    .map((a, i) => formatValue(a, response[i]))
-                    .join('\n')
-                : formatValue('Config', response);
+            const messages = withArgs
+                ? args.map((a, i) => formatValue(a, response[i]))
+                : Object.entries(response).map(([k, v]) => formatValue(k, v));
 
-
-            await ctx.reply(message, { parse_mode: 'MarkdownV2' });
+            for (const message of messages) {
+                await ctx.reply(message, { parse_mode: 'MarkdownV2' });
+                await timers.setTimeout(100);
+            }
         }
         catch (e) {
             await ctx.reply(`Error: ${e}`);
