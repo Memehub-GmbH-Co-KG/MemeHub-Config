@@ -13,7 +13,10 @@
             "categories": "state:categories",
             "mappings": "state:categories:mappings",
             "maximum": "state:categories:maximum",
-            "columns": "state:categories:columns"
+            "columns": "state:categories:columns",
+            "posts": "limits:state:posts",
+            "votes": "limits:state:vote",
+            "tokens": "tokens:state:tokens"
         }
     },
     "rrb": {
@@ -28,7 +31,15 @@
                 "get": "logging:get"
             },
             "meme": {
-                "edited": "events:edit"
+                "edited": "events:edit",
+                "posted": "events:post"
+            },
+            "vote": {
+                "issued": "events:vote",
+                "retracted": "events:retract-vote"
+            },
+            "token": {
+                "issue": "tokens:issue"
             },
             "categories": {
                 "created": "events:category-created",
@@ -50,6 +61,11 @@
                 "validate": "categories:validate",
                 "getOrSetMaximum": "categories:maximum",
                 "getOrSetColumns": "categories:columns"
+            },
+            "limits": {
+                "mayPost": "limits:may-post",
+                "mayVote": "limits:may-vote",
+                "getQuota": "limits:quota"
             },
             "permissions": {
                 "isAdmin": "permissions:is-admin",
@@ -147,5 +163,27 @@
     },
     "permissions": {
         "ttl": 3600000
+    },
+    "limits": {
+        "post": {
+            "time": {
+                "quota": 2,
+                "cron": "0 05 * * *"
+            },
+            "tokens": {
+                "gain": 1,
+                "cost": 1,
+                "threshold": 10,
+                "applicableVotes": [
+                    "like",
+                    "weeb"
+                ]
+            }
+        },
+        "vote": {
+            "cooldown": 2000,
+            "ban": 300000,
+            "votes": 4
+        }
     }
 }
