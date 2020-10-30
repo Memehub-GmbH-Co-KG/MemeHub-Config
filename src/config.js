@@ -219,11 +219,7 @@ module.exports.build = async base_config => {
         // Read actual config
         try {
             const file = await fs.promises.readFile(base_config.file);
-            console.log('config before merge');
-            console.log(config);
             mergeDeep(config, JSON.parse(file));
-            console.log('config after merge');
-            console.log(config);
         }
         catch (error) {
             // This likely means that the config file does not exist.
