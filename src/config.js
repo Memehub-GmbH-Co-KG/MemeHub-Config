@@ -5,6 +5,7 @@ const Lock = require('./lock');
 const startLock = new Lock();
 const log = require('./log');
 const _commands = require('./commands');
+const timers = require('timers/promises');
 let current = undefined;
 
 const KEY_SEP = ':';
@@ -151,7 +152,8 @@ module.exports.build = async base_config => {
 
         // publish changed
         await log.log('info', 'Config updated', keys);
-        await publisherChanged.publish(Object.keys(keys));
+        publisherChanged.publish(Object.keys(keys))
+            .catch(e => log.log('error', 'Failed to publish config changes', e));
     }
 
     /**
@@ -174,7 +176,7 @@ module.exports.build = async base_config => {
     }
 
     /**
-     * Restart when the rrb config is changed.
+     * Trigger delayed restart, if rrb config changes.
      * @param {*} keys 
      */
     async function onChanged(keys) {
@@ -184,8 +186,10 @@ module.exports.build = async base_config => {
         if (!keys.some(k => k.startsWith('rrb')))
             return;
 
-        restart(base_config);
+        timers.setTimeout(6000)
+            .then(() => restart(base_config));
     }
+
 
     /**
      * Calls read_config_no_lock while having the file lock.
