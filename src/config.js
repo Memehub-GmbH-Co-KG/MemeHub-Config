@@ -4,7 +4,6 @@ const path = require('path');
 const Lock = require('./lock');
 const startLock = new Lock();
 const log = require('./log');
-const _commands = require('./commands');
 const timers = require('timers/promises');
 let current = undefined;
 
@@ -76,9 +75,11 @@ module.exports.build = async base_config => {
     // Set up rrb
     Defaults.setDefaults({
         redis: {
-            prefix: "mh:",
-            host: "mhredis",
-            port: 6379
+            prefix: process.env.REDIS_PREFIX || 'mh:',
+            host: process.env.REDIS_HOST || "mhredis",
+            port: process.env.REDIS_PORT || undefined,
+            db: process.env.REDIS_DB || undefined,
+            password: process.env.REDIS_PASSWORD || undefined
         }
     });
 
@@ -97,9 +98,6 @@ module.exports.build = async base_config => {
         publisherChanged.connect(),
         subscriberChanged.listen()
     ]);
-
-    // Register telegram commands
-    const commands = await _commands.build(config, get, set);
 
     await log.log('notice', 'Startup complete');
 
@@ -267,8 +265,7 @@ module.exports.build = async base_config => {
                 workerSet.stop(),
                 workerGet.stop(),
                 publisherChanged.disconnect(),
-                subscriberChanged.stop(),
-                commands.stop
+                subscriberChanged.stop()
             ]);
             await log.stop();
         }
