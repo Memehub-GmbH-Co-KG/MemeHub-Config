@@ -14,7 +14,7 @@
     "docker-names": "^1.1.1",
     "ioredis": "^4.17.3",
     "js-yaml": "^3.14.0",
-    "redis-request-broker": "^1.11.1",
+    "redis-request-broker": "1.12.0",
     "telegraf": "^3.38.0",
     "telegraf-command-parts": "^1.0.3"
   }
