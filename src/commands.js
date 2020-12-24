@@ -24,7 +24,7 @@ module.exports.build = async (config, get, set) => {
             const response = await get(withArgs ? args : false);
             const messages = withArgs
                 ? args.map((a, i) => formatValue(a, response[i]))
-                : Object.entries(response).map(([k, v]) => formatValue(k, v));
+                : Object.keys(response).reduce((res, key) => `${res}\n - ${key}`, 'Available keys:');
 
             for (const message of messages) {
                 await ctx.reply(message, { parse_mode: 'MarkdownV2' });
@@ -56,6 +56,10 @@ module.exports.build = async (config, get, set) => {
             .replace(/\./g, '\\.');
     }
 
+    /**
+     * Checks whether a user has permissions to interact with the config (read and write).
+     * @param {*} user 
+     */
     async function hasPermissions(user) {
         try {
             return await clientHasPermissions.request(user.id);

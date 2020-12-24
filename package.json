@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "build": "docker build -t memehub-config ."
+    "build": "docker build -t leifb/memehub-config ."
   },
   "author": "leifb",
   "license": "ISC",
